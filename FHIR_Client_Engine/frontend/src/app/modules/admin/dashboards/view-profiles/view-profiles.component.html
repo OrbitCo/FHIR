@@ -1,0 +1,98 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <!-- Header -->
+    <div class="p-6">
+        <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+            <div class="w-full text-center">
+                <span class="text-lg font-medium mb-10">Partners</span>
+                <button class="add-partner-btn mat-flat-button" (click)="createPartner()">+ New Partner</button>
+            </div>
+            <div class="w-full text-center mt-5 mb-5">
+                <form [formGroup]="viewProfileForm">
+                    <div class="flex justify-center mt-5 mb-5">
+                        <mat-form-field class="col-sm-4 inp">
+                            <mat-select formControlName="partnerName" placeholder="Select/Search Partner"
+                                (selectionChange)="getPartnerDetails($event)">
+                                <div class="fixed w-full">
+                                    <mat-form-field [floatLabel]="'never'" class="w-full">
+                                        <input matInput placeholder="" class="p-t-1" (input)="lookup($event.target.value);"
+                                            #inputFilter>
+                                        <mat-icon svgIcon="heroicons_solid:search" matPrefix></mat-icon>
+                                        <mat-icon svgIcon="heroicons_solid:x" matSuffix (click)="clean(inputFilter);"></mat-icon>
+                                    </mat-form-field>
+                                </div>
+                                <div class="p-t-5">
+                                    <mat-option *ngFor="let data of filteredDataToSearch" [value]="data.value">
+                                        {{data.text}}
+                                    </mat-option>
+                                </div>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </form>
+            </div>
+            <div *ngFor="let profile of allProfiles; index as i;">
+                <div>
+                    <fieldset class="mb-5">
+                        <legend class="font-medium">{{profile.partnerName}}</legend>
+                        <div class="text-right">
+                            <button (click)="editPartnerProfile(profile)"><mat-icon svgIcon="mat_solid:edit"></mat-icon></button>
+                            <button (click)="partnerDeleteDialog(profile)"><mat-icon svgIcon="mat_solid:delete"></mat-icon></button>
+                        </div>
+                        <p><span class="font-semibold f-s-18">Description :</span> {{profile.description}}</p>
+                        <p class="mt-5"><span class="font-semibold f-s-18">Contact(s) :</span></p>
+                        <div class="overflow-x-auto">
+                            <table>
+                                <tbody>
+                                    <tr class="bg_color">
+                                        <th>Primary Contact Name</th>
+                                        <th>Email</th>
+                                        <th>Contact Number</th>
+                                    </tr>
+                                    <tr>
+                                        <td>{{profile.primaryContactName}}</td>
+                                        <td>{{profile.email}}</td>
+                                        <td>{{profile.mobileNumber}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <div class="flex items-center mt-10">
+                                <h3 class="font-medium mt-5 mb-5 f-s-22">Projects :</h3>
+                                <button class="add-partner-btn mat-flat-button ml-5" (click)="createProject(profile)">+ New Project</button>
+                            </div>
+                            <div *ngIf="allProfiles[i].projects.length > 0">
+                                <div>
+                                    <div  class="mb-5">
+                                        
+                                        <div class="overflow-x-auto">
+                                            <table>
+                                                <tbody>
+                                                    <tr class="bg_color">
+                                                        <th>Project</th>
+                                                        <th>Status</th>
+                                                        <th>Frequency</th>
+                                                    </tr>
+                                                    <tr *ngFor="let project of allProfiles[i].projects; index as j;">
+                                                        <td><a role="button" (click)="goToProjectView(project)">{{project.projectName}}</a></td>
+                                                        <td>{{project.status}}</td>
+                                                        <td>{{project.frequency}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="allProfiles[i].projects.length == 0">
+                                <p>Currently you don't have any projects added.</p>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <hr>
+            </div>
+            <div *ngIf="allProfiles?.length == 0" class="text-center">Please Add/Select partner to view details.</div>
+        </div>
+    </div>
+</div>

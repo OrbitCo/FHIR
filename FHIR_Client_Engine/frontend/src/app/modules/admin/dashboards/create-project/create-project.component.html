@@ -1,0 +1,418 @@
+<form [formGroup]="createProjectForm" class="w-full">
+    <div class="flex flex-col flex-auto min-w-0">
+        <div class="p-6">
+            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+            <h2 class="text-lg font-medium mb-10 text-center">{{ this.isEdit ? 'Update Project' : 'Create Project'}}</h2>
+                <mat-tab-group
+                    class="sm:px-2"
+                    [animationDuration]="'0'">
+
+                    <!-- Project Settings -->
+                    <mat-tab label="Project Settings">
+                        <ng-template matTabContent>
+                            <div class="prose-sm mb-5">
+                            <h2 class="font-medium mb-5">Project Settings</h2>
+                            <div class="flex items-start justify-between">
+                                <mat-form-field class="w-49">
+                                    <input matInput [placeholder]="'Project Name'" formControlName="projectName" pattern="^[a-zA-Z0-9-\s]+$">
+                                    <mat-error *ngIf="createProjectForm.get('projectName')?.errors?.pattern" class="fs-12 mb-1 mt-2">Enter valid project name</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="w-49">
+                                    <mat-select [placeholder]="'Partner Name'" formControlName="partnerId">
+                                        <mat-option *ngFor="let partner of partnerNames" [value]="partner.id">{{partner.name}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="items-start justify-between">
+                                <mat-form-field class="w-full fuse-mat-textarea flex-auto">
+                                    <textarea matInput [placeholder]="'Description'" formControlName="description" maxlength="250"></textarea>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex items-start justify-between">
+                                <mat-form-field class="w-49">
+                                    <mat-select [placeholder]="'Status'"
+                                        formControlName="status">
+                                        <mat-option value="Active">Active</mat-option>
+                                        <mat-option value="Inactive">Inactive</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex items-start justify-between">
+                                <mat-form-field class="w-49">
+                                    <input matInput [placeholder]="'Email ID'" formControlName="email" type="email">
+                                    <mat-error *ngIf="createProjectForm.get('email')?.errors?.pattern" class="fs-12 mb-1 mt-2">Enter valid E-mail address</mat-error>
+                                </mat-form-field>
+                                <mat-form-field class="w-49">
+                                    <input matInput [placeholder]="'Phone Number'" formControlName="contactNumber" (keypress)="numberOnly($event)" minlength="10" maxlength="10">
+                                    <mat-error *ngIf="createProjectForm.get('contactNumber')?.errors?.pattern || createProjectForm.get('contactNumber')?.dirty" class="fs-12 mb-1 mt-2">Enter valid mobile number</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        </ng-template>
+                    </mat-tab>
+
+                    <!-- Connectivity Profile -->
+                    <mat-tab label="Connectivity Profile">
+                        <ng-template matTabContent>
+                        <aside class="prose-sm mb-5">
+                            <h2 class="font-medium mb-5">Connectivity Profile</h2>
+                        </aside>
+                        <div class="prose-sm mb-5" *ngFor="let authModel of authentications.slice(1); index as i">
+                            <div class="flex items-start justify-between">
+
+                                <mat-form-field class="w-full">
+                                    <input matInput [placeholder]="'Authentication Name'" formControlName="{{this.formatCamelCase(i+1, 'authName')}}"
+                                           [(ngModel)]="authentications[i+1].name" [ngModelOptions]="{standalone: true}">
+                                </mat-form-field>
+                                <div class="text-right" *ngIf="authentications.length > 2 && (i+2) == authentications.length">
+                                    <button><mat-icon svgIcon="mat_solid:delete" (click)="removeAuth(i+1)"></mat-icon></button>
+                                </div>
+                            </div>
+                            <div class="flex items-start justify-between">
+                                <mat-form-field class="flex-auto gt-xs:pr-3 w-full">
+                                    <mat-select [placeholder]="'Authentication'"
+                                        formControlName="{{this.formatCamelCase(i+1, 'authType')}}" (selectionChange)="changeAuthentication($event, i+1)"
+                                                [(ngModel)]="authentications[i+1].authenticationType"
+                                                [ngModelOptions]="{standalone: true}">
+                                        <mat-option value="NoAuth">No Auth</mat-option>
+                                        <mat-option value="OAuth">OAuth</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div *ngIf="authentications[i+1].authenticationType == 'OAuth'" class="prose-sm mb-5">
+                                <div class="flex items-start justify-between">
+                                    <mat-form-field class="flex-auto gt-xs:pr-3 w-full">
+                                        <mat-select [placeholder]="'Grant Type'" formControlName="{{this.formatCamelCase(i+1, 'grantType')}}"
+                                            (selectionChange)="changeGrantType($event, i+1)"
+                                                    [(ngModel)]="authentications[i+1].grantType"
+                                                    [ngModelOptions]="{standalone: true}">
+                                            <mat-option value="authorization_code">Authorization Code</mat-option>
+                                            <mat-option value="client_credentials">Client Credential</mat-option>
+                                            <mat-option value="client_jwt">Client JWT</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex items-start justify-between">
+                                    <!-- Authoritzation Endpoint will not appear if grant type is Client Credentials -->
+                                    <mat-form-field class="w-49" *ngIf="authentications[i+1].grantType == 'authorization_code'">
+                                        <input matInput [placeholder]="'Authorization Endpoint'"
+                                            formControlName="{{this.formatCamelCase(i+1, 'authorizationEndpoint')}}"
+                                               [(ngModel)]="authentications[i+1].authorizationEndpoint"
+                                               [ngModelOptions]="{standalone: true}">
+                                    </mat-form-field>
+                                    <mat-form-field [ngClass]="authentications[i+1].grantType == 'authorization_code' ?
+                                                        'w-49' : 'w-full'">
+                                        <input matInput [placeholder]="'Token Endpoint'" formControlName="{{this.formatCamelCase(i+1, 'tokenEndpoint')}}"
+                                               [(ngModel)]="authentications[i+1].tokenEndpoint"
+                                               [ngModelOptions]="{standalone: true}">
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex items-start justify-between">
+                                    <mat-form-field class="w-49">
+                                        <input matInput [placeholder]="'Client ID'" formControlName="{{this.formatCamelCase(i+1, 'clientId')}}"
+                                               [(ngModel)]="authentications[i+1].clientId"
+                                               [ngModelOptions]="{standalone: true}">
+                                    </mat-form-field>
+                                    <mat-form-field class="w-49">
+                                        <input matInput [placeholder]="'Client Secret'" formControlName="{{this.formatCamelCase(i+1, 'clientSecret')}}"
+                                               [(ngModel)]="authentications[i+1].clientSecret"
+                                               [ngModelOptions]="{standalone: true}">
+                                    </mat-form-field>
+                                </div>
+                                <div class="items-start justify-between" *ngIf="authentications[i+1].grantType == 'authorization_code'">
+                                    <mat-form-field class="w-full fuse-mat-textarea flex-auto">
+                                        <textarea matInput [placeholder]="'Redirect URLs (one per line)'"
+                                            formControlName="{{this.formatCamelCase(i+1, 'redirectUrls')}}"
+                                                  [(ngModel)]="authentications[i+1].redirectUrls"
+                                                  [ngModelOptions]="{standalone: true}"></textarea>
+                                    </mat-form-field>
+                                </div>
+                                {{authentications[i+1].tokenRetrievalStatus}}
+                                <div class="formattedTokenText" *ngIf="authentications[i+1].oAuthToken">
+                                    <pre>{{authentications[i+1].oAuthToken | json}}</pre>
+                                </div>
+                                <div class="text-center">
+                                    <button class="px-6 ml-3 max-w-80 connButtons mr-5" (click)="retrieveToken(i+1)" mat-button>
+                                        Retrieve Token
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-left">
+                            <button class="px-6 ml-3 max-w-80 connButtons mr-5" (click)="addAuth(null, this.authentications.length)" mat-button>
+                                Add Authentication
+                            </button>
+                        </div>
+                        </ng-template>
+                    </mat-tab>
+
+                    <!-- Data Query -->
+                    <mat-tab label="Data Query">
+                        <ng-template matTabContent>
+                            <div class="prose-sm mb-5">
+                            <h2 class="font-medium mb-5">Data Query</h2>
+                            <div class="flex items-start justify-between">
+                                <mat-form-field class="w-49">
+                                    <input matInput [placeholder]="'Connection'" [(ngModel)]="requests[0].connection" [ngModelOptions]="{standalone: true}"
+                                           formControlName="connection1">
+                                </mat-form-field>
+                                <mat-form-field class="w-49">
+                                    <mat-select [placeholder]="'Authentication'"  [ngModelOptions]="{standalone: true}"
+                                                formControlName="FHIRQueryAuthentication1" (selectionChange)="changeFHIRQueryAuth($event, 0)">
+                                        <mat-option *ngFor="let auth of authentications" value="{{auth.name}}">{{auth.name}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="flex items-start justify-between">
+                                <mat-form-field class="w-49">
+                                    <input matInput [placeholder]="'Query (ie. Patient?status=Active )'" [(ngModel)]="requests[0].query" [ngModelOptions]="{standalone: true}"
+                                        formControlName="query1">
+                                </mat-form-field>
+                                <mat-form-field class="w-49">
+                                    <mat-select [placeholder]="'Full Payload'" [(ngModel)]="requests[0].type" [ngModelOptions]="{standalone: true}"
+                                                (selectionChange)="changeNestedQueryType($event, 0)">
+                                        <mat-option value="full" selected>Full Payload</mat-option>
+                                        <mat-option value="nested">Nested</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div *ngFor="let request of filterOutFirstEntry(requests); index as i; trackBy: trackByRequestOrder">
+                                <div class="flex items-start justify-between">
+                                    <mat-form-field class="w-full">
+                                        <input matInput [placeholder]="'Return Value (fhir path, i.e. Patient.id)'" formControlName="returnValue{{i+2}}"
+                                               [(ngModel)]="request.returnValue" [ngModelOptions]="{standalone: true}">
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex items-start justify-between">
+                                    <mat-form-field class="w-49">
+                                        <input matInput [placeholder]="'Connection'" formControlName="connection{{i+2}}"
+                                               [(ngModel)]="request.connection" [ngModelOptions]="{standalone: true}">
+                                    </mat-form-field>
+                                    <mat-form-field class="w-49">
+                                        <mat-select [placeholder]="'Authentication'" [ngModelOptions]="{standalone: true}"
+                                                    formControlName="FHIRQueryAuthentication{{i+2}}" (selectionChange)="changeFHIRQueryAuth($evemt, i+1)">
+                                            <mat-option *ngFor="let auth of authentications" value="{{auth.name}}">{{auth.name}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex items-start justify-between">
+                                    <mat-form-field class="w-49">
+                                        <input matInput [placeholder]="'Query (ie. ExplanationOfBenefits?patient=<<Patient.id>> )'"
+                                               [(ngModel)]="request.query" [ngModelOptions]="{standalone: true}" formControlName="query{{i+2}}">
+                                    </mat-form-field>
+                                    <mat-form-field class="w-49">
+                                        <mat-select [placeholder]="'Full Payload'" [(ngModel)]="request.type" [ngModelOptions]="{standalone: true}"
+                                                    (selectionChange)="changeNestedQueryType($event,i+1)">
+                                            <mat-option value="full" selected>Full Payload</mat-option>
+                                            <mat-option value="nested">Nested</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex items-start justify-between">
+                                    <!-- Error Message Here -->
+                                </div>
+                            </div>
+                            <div class="flex items-start justify-between">
+                                <div class="w-49">
+                                    <button class="px-6 ml-3 max-w-80 connButtons mr-5" (click)="getAPIResult()" mat-button>
+                                        Test Query
+                                    </button>
+                                </div>
+                            </div>
+                            {{dataRetrievalStatus}}
+                            <div class="formattedText" *ngIf="jsonData">
+                                <pre>{{jsonData |json}}</pre>
+                            </div>
+                        </div>
+                        </ng-template>
+                    </mat-tab>
+
+                    <!-- Export -->
+                    <mat-tab label="Export">
+                        <ng-template matTabContent>
+                            <div class="prose-sm mb-5">
+                                <h2 class="font-medium mb-5">Export</h2>
+                                <div class="d-block px-6">
+
+                                    <div *ngFor="let data of outputList">
+                                        <mat-checkbox  #checkbox [checked]="exportCheckboxValue.includes(data.value)"
+                                                       (change)="outputCheckboxChange(data,$event)">
+                                            {{data.name}}
+                                        </mat-checkbox>
+                                    </div>
+
+                                    <!-- TODO: Removed disabled fields for testing.  Should be readded eventually -->
+
+                                    <div class="w-full" *ngIf="fhtrBlock">
+                                        <h2 class="font-medium">FHIR Import</h2>
+
+                                        <h3 class="font-small">Destination</h3>
+                                        <mat-form-field class="w-full">
+                                            <input matInput [placeholder]="'Server Address (will be POSTed to)'" formControlName="FHIRExportAddress">
+                                            <mat-error class="fs-12 mb-1 mt-2">Enter valid server address</mat-error>
+                                        </mat-form-field>
+
+                                        <h3 class="font-small">Authentication</h3>
+                                        <div class="flex items-start justify-between">
+                                            <mat-form-field class="flex-auto gt-xs:pr-3 w-full">
+                                                <mat-select [placeholder]="'Authentication'" [(value)]="FHIRExportAuthentication"
+                                                            formControlName="FHIRExportAuthentication">
+                                                    <mat-option *ngFor="let auth of authentications" value="{{auth.name}}">{{auth.name}}</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+
+                                        <!-- Radio: Batch or Transaction (Default) -->
+                                        <h3 class="font-small">Operation Type</h3>
+                                        <mat-radio-group formControlName="FHIRExportOpType" >
+                                            <mat-radio-button value="BATCH">Batch</mat-radio-button>
+                                            <mat-radio-button [checked]='true' value="TRNSC">Transaction</mat-radio-button>
+                                        </mat-radio-group>
+
+                                        {{FHIRExportRetrievalStatus}}
+                                        <div class="text-center">
+                                            <button class="px-6 ml-3 max-w-80 connButtons mr-5" (click)="FHIRExportSubmit()" mat-button>
+                                                Submit To Server
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div *ngIf="csvBlock">
+                                        <h2 class="font-medium">CSV</h2>
+                                        <mat-form-field class="w-full">
+                                            <input matInput [placeholder]="'File Name'" formControlName="basicCsvName"
+                                                   (input)="checkCSVUploadField()">
+                                            <mat-error class="fs-12 mb-1 mt-2">Enter valid file name</mat-error>
+                                        </mat-form-field>
+
+                                        <div class="d-block mb-5" *ngIf="checkColumnBlock">
+                                            <h3 class="font-medium">Columns</h3>
+                                            <div class="flex items-start justify-between">
+                                                <mat-form-field class="flex-auto gt-xs:pr-3 w-49">
+                                                    <mat-select [placeholder]="'FHIR Path'" formControlName="basicCoulumspath" multiple (selectionChange)="checkCSVUploadField()"
+                                                                [(ngModel)]='basicCoulumspath'>
+                                                        <mat-option #allSelected
+                                                                    (click)="toggleAllSelection()"
+                                                                    [value]="0">
+                                                            Select All
+                                                        </mat-option>
+                                                        <mat-option *ngFor="let columns of basicColumnsList" [value]="columns">{{columns}}</mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                        <div class="d-block mb-5" *ngIf="!checkColumnBlock">
+                                            <span>You haven't run a query yet - there are no columns to select.</span>
+                                        </div>
+                                        <button class="px-3 ml-3 connButtons" mat-flat-button [color]="'primary'" (click)="downloadCSV()" >Download CSV</button>
+
+                                        <div class="w-full">
+                                            <h2 class="font-medium">SEND METHOD</h2>
+                                            <div *ngFor="let method of sendMethods">
+                                                <mat-checkbox (change)="onCSVMethodSelection(method, $event)"
+                                                              [checked]="CSVSendMethodsCheckbox.includes(method.value)">
+                                                    {{method.name}}
+                                                </mat-checkbox>
+                                            </div>
+                                        </div>
+
+                                        <div *ngIf="csvEmailBlock" class="mt-6">
+                                            <h2 class="font-medium text-center">EMAIL</h2>
+                                            <mat-form-field class="w-full">
+                                                <input matInput [placeholder]="'Email'" formControlName="csvEmailAddress">
+                                                <mat-error class="fs-12 mb-1 mt-2">Enter valid email address</mat-error>
+                                            </mat-form-field>
+
+                                            <mat-form-field class="w-full">
+                                                <input matInput [placeholder]="'Subject'"
+                                                       formControlName="csvEmailSubject">
+                                                <mat-error class="fs-12 mb-1 mt-2">Please enter subject </mat-error>
+                                            </mat-form-field>
+
+                                            <mat-form-field class="w-full fuse-mat-textarea flex-auto">
+                                    <textarea matInput [placeholder]="'Email Body'"
+                                              formControlName="csvEmailBody" maxlength="250"></textarea>
+                                            </mat-form-field>
+                                            <button class="px-6 mt-3 ml-3 connButtons" mat-flat-button [color]="'primary'" (click)="sendCSVToEmail()">
+                                                Send CSV
+                                            </button>
+                                        </div>
+
+                                        <div *ngIf="csvSftpBlock" class="mt-6">
+                                            <h2 class="font-medium text-center">SFTP</h2>
+
+                                            <div class="flex items-start justify-between">
+
+                                                <mat-form-field class="w-70">
+                                                    <input matInput [placeholder]="'Server'" formControlName="csvSftpServer">
+                                                    <mat-error class="fs-12 mb-1 mt-2">Enter valid server name</mat-error>
+                                                </mat-form-field>
+
+                                                <mat-form-field class="w-28">
+                                                    <input matInput [placeholder]="'Port'"
+                                                           formControlName="csvSftpPortNumber">
+                                                    <mat-error class="fs-12 mb-1 mt-2">Enter valid port number</mat-error>
+                                                </mat-form-field>
+                                            </div>
+
+                                            <mat-form-field class="w-full">
+                                                <input matInput [placeholder]="'Working Directory'"
+                                                       formControlName="csvSftpDirectory">
+                                                <mat-error class="fs-12 mb-1 mt-2">Please enter directory</mat-error>
+                                            </mat-form-field>
+
+                                            <div class="flex items-start justify-between">
+                                                <mat-form-field class="w-49">
+                                                    <input matInput [placeholder]="'User'"
+                                                           formControlName="csvSftpUser">
+                                                    <mat-error class="fs-12 mb-1 mt-2">Please enter valid username</mat-error>
+                                                </mat-form-field>
+
+                                                <mat-form-field class="w-49">
+                                                    <input matInput [placeholder]="'Password'"
+                                                           formControlName="csvSftpPassword">
+                                                    <mat-error class="fs-12 mb-1 mt-2">Please enter valid password</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="flex items-start justify-between">
+                                                <div class="w-49">
+                                                    <input type="file" id="file" class="inputfile" (change)="onSelectFile($event, 'CSV')">
+                                                    <span>Note:- Choose private key file</span>
+                                                </div>
+                                                <button class="px-6 mt-3 ml-3 connButtons" mat-flat-button [color]="'primary'" (click)="uploadCSV()">
+                                                    Upload CSV
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start justify-between mt-5" *ngIf="jsonBlock">
+                                        <mat-form-field class="w-49">
+                                            <input matInput [placeholder]="'File Name'" formControlName="exportJson"
+                                                   [(ngModel)]='exportJson'>
+                                        </mat-form-field>
+                                        <div class="w-49 mb-3">
+                                            <button class="px-6 max-w-80 connButtons mr-5" (click)="downloadJsonFile()" mat-button [disabled]="!exportJson">
+                                                Export JSON
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </ng-template>
+                    </mat-tab>
+
+                </mat-tab-group>
+
+                <!-- TODO: Removed disabled fields for testing.  Should be readded eventually -->
+                <div>
+                    <button class="px-6 mt-3 ml-3" mat-flat-button [color]="'primary'"
+                        (click)="submitData()">
+                        {{ this.isEdit ? 'Update Project' : 'Create Project'}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,30 @@
+.wd-100{
+    width: 100%;
+}
+.wd-50{
+    width: 50%;
+}
+
+.cdk-overlay-pane{
+    overflow-y: auto !important;
+}
+
+mat-dialog-container{
+    create-profile{
+        .wd-50{
+            width: 100%;
+        }
+    }
+}
+
+@media only screen and (max-width: 900px) {
+    .wd-50{
+        width: 100%;
+    }
+    .p-6{
+        padding: 15px !important;
+    }
+    .mat-dialog-container {
+        padding: 15px !important;
+    }
+}

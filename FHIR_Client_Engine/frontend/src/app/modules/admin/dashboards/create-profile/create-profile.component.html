@@ -1,0 +1,54 @@
+<div *ngIf="data.edit" class="text-right">
+    <button (click)="close()" color="default">X</button>
+</div>
+<form  [formGroup]="partnerProfileForm" class="w-full">
+    <div class="flex flex-col flex-auto">
+        <!-- Header -->
+        <div class="p-6">
+            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden margin-auto-left-right wd-50">
+                <h2 class="text-lg font-medium mb-5 text-center">{{data.edit ? 'Update Partner Profile' : 'Create Partner Profile'}}</h2>
+                <div class="items-start justify-between">
+                    <mat-form-field class="w-full">
+                        <input matInput [placeholder]="'Partner Name'" formControlName="partnerName">
+                        <mat-error *ngIf="partnerProfileForm.get('partnerName')?.errors?.pattern" class="fs-12 mb-1 mt-2">Only letters allowed</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="items-start justify-between">
+                    <mat-form-field class="w-full">
+                        <input matInput [placeholder]="'Primary Contact Name'" formControlName="primaryContactName">
+                        <mat-error *ngIf="partnerProfileForm.get('primaryContactName')?.errors?.pattern" class="fs-12 mb-1 mt-2">Only letters allowed</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="items-start justify-between">
+                    <mat-form-field class="w-full">
+                        <input matInput [placeholder]="'Email ID'" formControlName="email" type="email">
+                        <mat-error *ngIf="partnerProfileForm.get('email')?.errors?.pattern" class="fs-12 mb-1 mt-2">Please enter valid E-mail address</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="items-start justify-between">
+                    <mat-form-field class="w-full">
+                        <input matInput [placeholder]="'Phone Number'" formControlName="mobileNumber" (keypress)="numberOnly($event)" minlength="10" maxlength="10">
+                        <mat-error *ngIf="partnerProfileForm.get('mobileNumber')?.errors?.pattern || partnerProfileForm.get('mobileNumber')?.dirty" class="fs-12 mb-1 mt-2">Please enter valid mobile number</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="items-start justify-between">
+                    <mat-form-field 
+                            class="w-full fuse-mat-textarea flex-auto">
+                            <textarea matInput [placeholder]="'Description'" formControlName="description" maxlength="250"></textarea>
+                        </mat-form-field>
+                </div>
+                <div>
+                    <button
+                        type="submit"
+                        class="px-6 ml-3"
+                        mat-flat-button
+                        [color]="'primary'"
+                        [disabled]="!partnerProfileForm.valid"
+                        (click)="submitData()">
+                        {{data.edit ? 'Update Profile' : 'Create Profile'}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

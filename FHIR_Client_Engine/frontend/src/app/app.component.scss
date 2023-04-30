@@ -1,0 +1,80 @@
+:host {
+    display: flex;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+}
+
+::ng-deep {
+    .green_btn {
+        background-color: #3ddc3d !important;
+        color: white;
+    }
+
+    .margin-auto-left-right {
+        margin: 0 auto !important;
+    }
+
+    .connButtons{
+        background-color: #0ca7e6 !important;
+        color: #fff !important;
+    }
+
+    .text-lg {
+        font-size: 1.5rem !important;
+    }
+
+    .green-color-snackbar {
+        background-color: #46af55c7 !important;
+        color: #fff !important;
+        text-align: center !important;
+    }
+    .red-color-snackbar {
+        background-color: #e71010c7 !important;
+        color: #fff !important;
+        text-align: center !important;
+    }
+    fieldset {
+        legend {
+          color: #000 !important;
+          font-size: 20px !important;
+          padding: 0 5px !important;
+        }
+        padding: 20px !important;
+        border: solid 1px #000 !important;
+      }
+
+      .mat-simple-snackbar {
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    .redText{
+        color: #e71010f2;
+        font-weight: 500;
+    }
+
+    .greenText{
+        color: #0f8920;
+        font-weight: 500;
+    }
+
+    .mat-dialog-container {
+        width: 550px !important;
+    }
+
+    .f-s-22{
+        font-size: 22px;
+    }
+
+    .f-s-18{
+        font-size: 18px;
+    }
+
+    .f-s-16{
+        font-size: 16px;
+    }
+    .mat-select-panel{
+        min-width:100% !important;
+    }
+}

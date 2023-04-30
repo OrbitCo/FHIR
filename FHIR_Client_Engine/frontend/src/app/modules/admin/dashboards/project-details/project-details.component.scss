@@ -1,0 +1,28 @@
+table {
+    width: 100%;
+
+    tbody {
+        text-align: center;
+        overflow-x: scroll;
+
+        .bg_color {
+            background-color: #d5dbdb;
+        }
+    }
+
+    th,
+    td {
+        border: 1px solid black;
+        padding: 10px 5px;
+    }
+
+    td a {
+        color: #0ca7e6;
+    }
+}
+
+.box-brdr{
+    border: 1px solid black;
+    padding: 20px;
+    border-radius: 10px;
+}

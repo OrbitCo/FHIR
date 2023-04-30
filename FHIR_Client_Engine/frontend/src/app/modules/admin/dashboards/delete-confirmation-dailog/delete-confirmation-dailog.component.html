@@ -1,0 +1,17 @@
+<!-- Modal -->
+<div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="DeleteModalLabel">Confirm Delete</h5>
+      </div>
+      <div class="modal-body">
+        <p>Do you really want to delete {{data.delete == 'deletePartner' ? 'partner' : 'project'}} : <span class="font-medium">{{data.delete == 'deletePartner' ? projectData.partnerName : projectData.projectName}}</span></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default closeButton" (click)="close()">Close</button>
+        <button type="button" class="btn btn-primary deleteDutton" (click)="deletePartnerOrProject()">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

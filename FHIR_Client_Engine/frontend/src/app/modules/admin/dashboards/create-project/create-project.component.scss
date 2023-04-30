@@ -1,0 +1,84 @@
+.formattedText{
+    height: 300px;
+    overflow: auto;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+}
+.hidden {
+    display: none;
+}
+body.light .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
+    color: #1e293b;
+}
+.mat-flat-button.mat-button-disabled.mat-button-disabled {
+    background-color: rgba(148, 163, 184, 0.38) !important;
+}
+
+.formattedTokenText{
+    height: 300px;
+    overflow: auto;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+}
+.inputfile {
+    border: 1px solid;
+    padding: 8px 15px;
+    width: 100%;
+    border-radius: 6px;
+    border-color: rgb(203 213 225 / var(--tw-border-opacity)) !important;
+}
+@media only screen and (max-width: 786px) {
+    .mat-form-field {
+        display: inline !important;
+    }
+    .prose-sm .flex{
+        display: block !important;
+    }
+    .mr-5{
+        margin-top: 5px;
+    }
+}
+
+.checkbox {
+    margin-right: 12px;
+    font-size: 12px;
+}
+
+.checkbox-list {
+    width: 200px;
+    text-align: left;
+    margin: auto;
+}
+
+.inputSelect {
+    width: 300px !important;
+    margin: auto;
+    text-align: center;
+}
+
+.columnFields {
+    display:  flex !important;
+    align-items: center;
+    margin-bottom:  16px;
+    margin-top: 10px;
+    .mat-form-field-wrapper {
+        margin-bottom: 0 !important;
+    }
+}
+
+.mat-radio-button, .mat-checkbox{
+    display: block !important;
+    margin-bottom: 10px;
+}
+
+.mat-label {
+    margin-bottom: 10px !important;
+}
+
+.w-70 {
+    width: 70%;
+}
+
+.w-28 {
+    width: 28% !important;
+}

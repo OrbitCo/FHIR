@@ -1,0 +1,50 @@
+fieldset {
+    min-width: 100%;
+}
+table {
+    width: 100%;
+    tbody{
+        text-align: center;
+        overflow-x: scroll;
+        .bg_color{
+            background-color: #d5dbdb;
+        }
+    }
+    th,td{
+        border: 1px solid black;
+        padding: 10px 5px;
+    }
+    td a{
+        color: #0ca7e6;
+    }
+}
+
+.add-partner-btn{
+    background-color: #0ca7e6 !important;
+    color: #fff !important;
+    float: right !important;
+    padding: 5px;
+}
+
+.inp {
+    width: 360px;
+}
+
+
+.fixed {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+::ng-deep{
+    .cdk-overlay-pane{
+        transform: translateX(4px) !important;
+    }
+    .p-t-1{
+        padding-left:10px
+    }
+    .p-t-5{
+        padding-top:50px;
+    }
+}
